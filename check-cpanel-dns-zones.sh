@@ -3,7 +3,7 @@
 # Checks the Named Configuration then
 # Checks all zones in the named.conf
 #
-# Written by Troy Germain
+# Written by Troy Germain modified by Amirhossein Matini
 
 # Base location of named configuration file
 NAMEDCONF="/etc/named.conf"
@@ -17,7 +17,7 @@ COMPATH="/usr/sbin/"
 #CHROOT location if applicable, if not just use null definition
 #CHROOT=""
 
-eval FILES=( $(sed -e 's/^[ \t]*//' ${CHROOT}${NAMEDCONF} | grep ^file | grep -v '^//' | awk -F\" '{printf "%s ", $(NF-1)}') )
+eval FILES=( $(sed -e 's/;/;\n/g' -e 's/^[ \t]*//' ${CHROOT}${NAMEDCONF} | grep [[:blank:]]file | grep -v '^//' | awk -F\" '{printf "%s ", $(NF-1)}') )
 
 ${COMPATH}named-checkconf
 if [[ $? != 0 ]]; then
@@ -33,10 +33,11 @@ for (( LOOP=1; LOOP<${#FILES[*]}; LOOP=LOOP+1 )); do
     if [[ $domain = "named.ca" ]]; then
         continue
     fi
-    ${COMPATH}named-checkzone $domain ${FILES[${LOOP}]} > /dev/null 2>&1
+    result=$(${COMPATH}named-checkzone $domain ${FILES[${LOOP}]})
     if [[ $? != 0 ]]; then
         echo "Check Failed! - $domain against ${FILES[${LOOP}]}"
-        exit 1
+        echo $result
+	exit 1
     fi
 done
 
