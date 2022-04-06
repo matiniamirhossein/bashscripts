@@ -29,12 +29,13 @@ echo "Named Config Test Passed"
 
 # Loop starts at 1 instead of 0 because of definition for named.ca
 for (( LOOP=1; LOOP<${#FILES[*]}; LOOP=LOOP+1 )); do
-    if [[ ${FILES[${LOOP}]} = "/var/named/named.ca" ]]; then
+    domain=$(basename ${FILES[${LOOP}]} .db)
+    if [[ $domain = "named.ca" ]]; then
         continue
     fi
-    ${COMPATH}named-checkzone $(basename ${FILES[${LOOP}]} .db) ${FILES[${LOOP}]} > /dev/null 2>&1
+    ${COMPATH}named-checkzone $domain ${FILES[${LOOP}]} > /dev/null 2>&1
     if [[ $? != 0 ]]; then
-        echo "Check Failed! - $(basename ${FILES[${LOOP}]} .db) against ${FILES[${LOOP}]}"
+        echo "Check Failed! - $domain against ${FILES[${LOOP}]}"
         exit 1
     fi
 done
