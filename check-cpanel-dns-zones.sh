@@ -28,7 +28,7 @@ fi
 echo "Named Config Test Passed"
 
 # Loop starts at 1 instead of 0 because of definition for named.ca
-for (( LOOP=1; LOOP<${#FILES[*]}; LOOP=LOOP+1 )); do
+for (( LOOP=0; LOOP<${#FILES[*]}; LOOP=LOOP+1 )); do
     domain=$(basename ${FILES[${LOOP}]} .db)
     if [[ $domain = "named.ca" ]]; then
         continue
