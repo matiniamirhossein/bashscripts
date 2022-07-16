@@ -19,9 +19,10 @@ COMPATH="/usr/sbin/"
 
 eval FILES=( $(sed -e 's/;/;\n/g' -e 's/^[ \t]*//' ${CHROOT}${NAMEDCONF} | grep [[:blank:]]file | grep -v '^//' | awk -F\" '{printf "%s ", $(NF-1)}') )
 
-${COMPATH}named-checkconf
+${COMPATH}named-checkconf -z >/dev/null
 if [[ $? != 0 ]]; then
-    echo "named.conf Configuration Check Failed!"
+    echo "named.conf Configuration Check Failed!, errors:"
+    named-checkconf -z | grep -v loaded
     exit 1
 fi
 
