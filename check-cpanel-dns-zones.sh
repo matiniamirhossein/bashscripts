@@ -19,16 +19,15 @@ COMPATH="/usr/sbin/"
 
 eval FILES=( $(sed -e 's/;/;\n/g' -e 's/^[ \t]*//' ${CHROOT}${NAMEDCONF} | grep [[:blank:]]file | grep -v '^//' | awk -F\" '{printf "%s ", $(NF-1)}') )
 
-${COMPATH}named-checkconf -z >/dev/null
+${COMPATH}named-checkconf -z > /dev/null 2>&1
 if [[ $? != 0 ]]; then
     echo "named.conf Configuration Check Failed!, errors:"
-    named-checkconf -z | grep -v loaded
+    named-checkconf -z 1>/dev/null
     exit 1
 fi
 
 echo "Named Config Test Passed"
 
-# Loop starts at 1 instead of 0 because of definition for named.ca
 for (( LOOP=0; LOOP<${#FILES[*]}; LOOP=LOOP+1 )); do
     domain=$(basename ${FILES[${LOOP}]} .db)
     if [[ $domain = "named.ca" ]]; then
