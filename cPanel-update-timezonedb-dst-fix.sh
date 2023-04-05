@@ -42,7 +42,7 @@ if [ -f /scripts/restartsrv_httpd ]; then
     /scripts/restartsrv_httpd
 fi
 
-systemctl restart httpd apache2 lshttpd lsws
+systemctl restart httpd apache2 lshttpd lsws php-fpm*
 
 pecl_files=($(find /usr/local/php*/bin /opt/cpanel/ea-php* /opt/alt -name php -printf '%p\n'))
 for i in ${pecl_files[@]}; do
