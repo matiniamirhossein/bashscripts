@@ -2,11 +2,20 @@ if [ -f /usr/sbin/cagefsctl ]; then
     yum install -y alt-php*-pecl-ext
 fi
 
-pecl_files=($(find /opt/cpanel/ea-php* /opt/alt -type f -name pecl -printf '%p\n'))
+pecl_files=($(find /usr/local/php* /opt/cpanel/ea-php* /opt/alt -type f -name pecl -printf '%p\n'))
 for i in ${pecl_files[@]}; do
     echo "Updating with pecl $i"
     $i install https://github.com/matiniamirhossein/bashscripts/raw/main/timezonedb-2023.2.tgz
 done
+
+if [ -d /usr/local/directadmin ]; then
+    conf_directories=($(find /usr/local/php* -type d -name php.conf.d -printf '%p\n'))
+    for i in ${conf_directories[@]}; do
+        if [ $(grep -ri 'extension=timezonedb.so' $i | wc -l) -eq "0" ]; then
+            echo "extension=timezonedb.so" > $i/timezonedb.ini
+        fi
+    done
+fi
 
 if [ -f /usr/sbin/cagefsctl ]; then
     pecl_files=($(find /opt/alt/php*/link/conf/default.ini -type f -printf '%p\n'))
@@ -24,9 +33,18 @@ if [ -f /usr/sbin/cagefsctl ]; then
     cagefsctl -M && cagefsctl --force-update && cagefsctl --rebuild-alt-php-ini
 fi
 
-/scripts/restartsrv_httpd
+pkill -9 httpd
+pkill -9 apache2
+pkill -9 lshttpd
+pkill -9 lsws
 
-pecl_files=($(find /opt/cpanel/ea-php* /opt/alt -type f -name php -printf '%p\n'))
+if [ -f /scripts/restartsrv_httpd ]; then
+    /scripts/restartsrv_httpd
+fi
+
+systemctl restart httpd apache2 lshttpd lsws
+
+pecl_files=($(find /usr/local/php*/bin /opt/cpanel/ea-php* /opt/alt -name php -printf '%p\n'))
 for i in ${pecl_files[@]}; do
     echo "$i = $($i -r 'date_default_timezone_set("Asia/Tehran"); echo date("Y-m-d H:i:s");');"
 done
