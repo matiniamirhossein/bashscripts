@@ -44,7 +44,7 @@ fi
 
 systemctl restart httpd apache2 lshttpd lsws php-fpm*
 
-pecl_files=($(find /usr/local/php*/bin /opt/cpanel/ea-php* /opt/alt -name php -printf '%p\n'))
+pecl_files=($(find -L /usr/local/php*/bin /opt/cpanel/ea-php* /opt/alt -type f -name php -printf '%p\n'))
 for i in ${pecl_files[@]}; do
     echo "$i = $($i -r 'date_default_timezone_set("Asia/Tehran"); echo date("Y-m-d H:i:s");');"
 done
