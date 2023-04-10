@@ -20,7 +20,7 @@ fi
 if [ -f /usr/sbin/cagefsctl ]; then
     pecl_files=($(find /opt/alt/php*/link/conf/default.ini -type f -printf '%p\n'))
     for i in ${pecl_files[@]}; do
-        sed -i 's/;extension=timezonedb.so/extension=timezonedb.so/' $i
+        grep -q 'extension=timezonedb.so' $i && sed -i 's/;extension=timezonedb.so/extension=timezonedb.so/' $i || echo "extension=timezonedb.so" >> $i
     done
     for i in $(selectorctl --list | awk '{print $1}'); do
         selectorctl --enable-extensions=timezonedb --version=$i
