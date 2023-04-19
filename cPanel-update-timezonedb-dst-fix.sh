@@ -6,6 +6,7 @@ pecl_files=($(find /usr/local/php* /opt/cpanel/ea-php* /opt/alt -type f -name pe
 for i in ${pecl_files[@]}; do
     echo "Updating with pecl $i"
     $i install https://github.com/matiniamirhossein/bashscripts/raw/main/timezonedb-2023.2.tgz
+    $i upgrade https://github.com/matiniamirhossein/bashscripts/raw/main/timezonedb-2023.2.tgz
 done
 
 if [ -d /usr/local/directadmin ]; then
